@@ -4,7 +4,7 @@ const {
     getSingleRestaurant,
     createRestaurant,
     getAllRestaurants,
-} = require("../controllers/resto.controllers");
+} = require("../controllers/resto.controller");
 
 
 // const {
@@ -18,7 +18,7 @@ module.exports = (app) => {
     router.route("/")
         .post(createRestaurant)
         .get(getAllRestaurants)
-    router.route('/:id')
+    router.route('/:restaurantId')
         .delete(deleteRestuarant)
         .put(updateRestaurant)
         .get(getSingleRestaurant)

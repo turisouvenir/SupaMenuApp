@@ -1,5 +1,5 @@
 const { Restaurant } = require("../models/resto.model");
-const { tableValidationSchema } = require("../models/table.model");
+const { tableValidationSchema, Table } = require("../models/table.model");
 
 // Create a new table for a restaurant
 exports.createRestoTable = async (req, res) => {
@@ -9,7 +9,7 @@ exports.createRestoTable = async (req, res) => {
             return res.status(400).json({ error: error.details[0].message });
         }
 
-        const restaurant = await Restaurant.findById(req.body.restaurant);
+        const restaurant = await Restaurant.findById(req.body.restaurantId);
         if (!restaurant) {
             return res.status(404).json({ error: 'Restaurant not found' });
         }
@@ -26,7 +26,7 @@ exports.createRestoTable = async (req, res) => {
 // Get all tables for a restaurant
 exports.getAllRestoTables = async (req, res) => {
     try {
-        const restaurant = await Restaurant.findById(req.body.restaurant);
+        const restaurant = await Restaurant.findById(req.params.restaurantId);
         if (!restaurant) {
             return res.status(404).json({ error: 'Restaurant not found' });
         }
@@ -41,13 +41,14 @@ exports.getAllRestoTables = async (req, res) => {
 // Get a single table for a restaurant
 exports.getSingleRestoTable = async (req, res) => {
     try {
-        const restaurant = await Restaurant.findById(req.body.restaurant);
+        const restaurant = await Restaurant.findById(req.params.restaurantId);
+
         if (!restaurant) {
             return res.status(404).json({ error: 'Restaurant not found' });
         }
 
         const table = await Table.findOne({
-            _id: req.params.id,
+            _id: req.params.tableId,
             restaurant: restaurant._id,
         });
         if (!table) {
@@ -68,13 +69,13 @@ exports.updateRestoTable = async (req, res) => {
             return res.status(400).json({ error: error.details[0].message });
         }
 
-        const restaurant = await Restaurant.findById(req.body.restaurant);
+        const restaurant = await Restaurant.findById(req.body.restaurantId);
         if (!restaurant) {
             return res.status(404).json({ error: 'Restaurant not found' });
         }
 
         const table = await Table.findOneAndUpdate(
-            { _id: req.params.id, restaurant: restaurant._id },
+            { _id: req.params.tableId, restaurant: restaurant._id },
             req.body,
             { new: true }
         );
@@ -91,13 +92,13 @@ exports.updateRestoTable = async (req, res) => {
 // Delete a table for a restaurant
 exports.deleteRestoTable = async (req, res) => {
     try {
-        const restaurant = await Restaurant.findById(req.body.restaurant);
+        const restaurant = await Restaurant.findById(req.params.restaurantId);
         if (!restaurant) {
             return res.status(404).json({ error: 'Restaurant not found' });
         }
 
         const table = await Table.findOneAndDelete({
-            _id: req.params.id,
+            _id: req.params.tableId,
             restaurant: restaurant._id,
         });
         if (!table) {

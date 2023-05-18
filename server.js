@@ -34,12 +34,12 @@ const swaggerOptions = {
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 
-app.get("/swagger.json", function (req, res) {
-  res.setHeader("Content-Type", "application/json");
-  res.send(swaggerDocs);
-});
+// app.get("/swagger.json", function (req, res) {
+//   res.setHeader("Content-Type", "application/json");
+//   res.send(swaggerDocs);
+// });
 
-app.use("/api", swaggerUi.serve, swaggerUi.setup(swaggerDocs, false, { docExpansion: "none" }));
+// app.use("/api", swaggerUi.serve, swaggerUi.setup(swaggerDocs, false, { docExpansion: "none" }));
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);

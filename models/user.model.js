@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
  *     properties:
  *       _id:
  *         type: string
- *       names:
+ *       fullName:
  *         type: string
  *       email:
  *         type: string
@@ -17,18 +17,15 @@ const jwt = require('jsonwebtoken');
  *         type: string
  *       phone:
  *         type: string
- *       nationalId:
- *         type: string
  *     required:
- *       - names
+ *       - fullName
  *       - email
  *       - password
  *       - phone
- *       - nationalId
  */
 
 var schema = mongoose.Schema({
-  names: {
+  fullName: {
     type: String,
     required: true,
   },
@@ -42,15 +39,15 @@ var schema = mongoose.Schema({
     unique: true,
     required: true,
   },
+  role: {
+    type: String,
+    enum: ['restoOwner', 'restoGuest', 'Admin'],
+    required: true
+  },
   password: {
     type: String,
     required: true,
-  },
-  nationalId: {
-    type: String,
-    unique: true,
-    required: true,
-  },
+  }
 }, {
   timestamps: true
 });
@@ -64,18 +61,18 @@ schema.methods.generateAuthToken = function () {
   })
 };
 
-const Model = mongoose.model("user", schema);
+const Model = mongoose.model("User", schema);
 module.exports.NationalIdPattern = /(?<!\d)\d{16}(?!\d)/;
 module.exports.PhoneRegex = /(?<!\d)\d{10}(?!\d)/
 
 module.exports.User = Model;
-module.exports.validateUser = (body,isUpdating=false) => {
+module.exports.validateUser = (body, isUpdating = false) => {
   return Joi.object({
-    names: Joi.string().required(),
+    fullName: Joi.string().required(),
+    role: Joi.string().valid('restoOwner', 'Admin', 'restoGuest').required(),
     email: Joi.string().email().required(),
     phone: Joi.string().pattern(this.PhoneRegex).required(), // validate phone
     password: isUpdating ? Joi.string().min(6) : Joi.string().min(6).required(),
-    nationalId: Joi.string().pattern(this.NationalIdPattern).length(16).required(),
   }).validate(body);
 };
 

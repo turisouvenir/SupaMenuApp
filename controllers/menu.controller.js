@@ -11,7 +11,7 @@ exports.createMenuItem = async (req, res) => {
             return res.status(400).json({ error: error.details[0].message });
         }
 
-        const restaurant = await Restaurant.findById(req.body.restaurant);
+        const restaurant = await Restaurant.findById(req.body.restaurantId);
         if (!restaurant) {
             return res.status(404).json({ error: 'Restaurant not found' });
         }
@@ -29,13 +29,12 @@ exports.createMenuItem = async (req, res) => {
 // Get all menu items for a restaurant
 exports.getAllMenuItemsForResto = async (req, res) => {
     try {
-        const restaurant = await Restaurant.findById(req.body.restaurant);
+        const restaurant = await Restaurant.findById(req.params.restaurantId);
         if (!restaurant) {
             return res.status(404).json({ error: 'Restaurant not found' });
         }
-
-        const menus = await Menu.find({ restaurant: restaurant })
-
+        
+        const menus = await Menu.find({ restaurant: restaurant._id })
         res.json(menus);
     } catch (err) {
         res.status(500).json({ error: 'An error occurred' });
@@ -45,12 +44,12 @@ exports.getAllMenuItemsForResto = async (req, res) => {
 // Get a single menu item for a restaurant
 exports.getSingleMenuItem = async (req, res) => {
     try {
-        const restaurant = await Restaurant.findById(req.params.restaurant);
+        const restaurant = await Restaurant.findById(req.params.restaurantId);
         if (!restaurant) {
             return res.status(404).json({ error: 'Restaurant not found' });
         }
 
-        const menuItem = await Menu.findById(req.params.id);
+        const menuItem = await Menu.findById(req.params.menuId);
         if (!menuItem) {
             return res.status(404).json({ error: 'Menu item not found' });
         }
@@ -69,12 +68,12 @@ exports.updateMenuItem = async (req, res) => {
             return res.status(400).json({ error: error.details[0].message });
         }
 
-        const restaurant = await Restaurant.findById(req.params.restaurant);
+        const restaurant = await Restaurant.findById(req.body.restaurantId);
         if (!restaurant) {
             return res.status(404).json({ error: 'Restaurant not found' });
         }
 
-        const menuItem = await Menu.findById(req.params.id);
+        const menuItem = await Menu.findById(req.params.menuId);
         if (!menuItem) {
             return res.status(404).json({ error: 'Menu item not found' });
         }
@@ -91,18 +90,20 @@ exports.updateMenuItem = async (req, res) => {
 // Delete a menu item for a restaurant
 exports.deleteMenuItem = async (req, res) => {
     try {
-        const restaurant = await Restaurant.findById(req.params.restaurant);
+        const restaurant = await Restaurant.findById(req.params.restaurantId);
         if (!restaurant) {
             return res.status(404).json({ error: 'Restaurant not found' });
         }
 
-        const menuItem = await Menu.findById(req.params.id);
+        const menuItem = await Menu.findById(req.params.menuId);
         if (!menuItem) {
             return res.status(404).json({ error: 'Menu item not found' });
         }
 
-        menuItem.remove();
-        await menuItem.save();
+        await Menu.findOneAndDelete({
+            _id: req.params.menuId,
+            restaurant: restaurant._id,
+        });
 
         res.json({ message: 'Menu item deleted successfully' });
     } catch (err) {

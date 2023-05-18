@@ -4,7 +4,7 @@ const {
     getSingleMenuItem,
     updateMenuItem,
     deleteMenuItem
-} = require("../controllers/menu.controllers");
+} = require("../controllers/menu.controller");
 
 
 module.exports = (app) => {
@@ -12,12 +12,14 @@ module.exports = (app) => {
 
     router.route("/")
         .post(createMenuItem)
-        .get(getAllMenuItemsForResto)
-    router.route('/:id')
-        .delete(deleteMenuItem)
+    router.route("/:menuId")
         .put(updateMenuItem)
+    router.route("/all/:restaurantId")
+        .get(getAllMenuItemsForResto)
+    router.route('/:restaurantId/:menuId')
+        .delete(deleteMenuItem)
         .get(getSingleMenuItem)
 
 
-    app.use("/api/menu", router);
+    app.use("/api/menus", router);
 };

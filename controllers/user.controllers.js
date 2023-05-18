@@ -24,20 +24,14 @@ exports.createUser = async (req, res) => {
             message: error.details[0].message
         });
 
-        // let count = await User.countDocuments({});
-        // if (count) return res.status(400).send({message: "Admin is already created"});
-
         let {
             email,
-            nationalId,
             phone
         } = req.body
 
         let user = await User.findOne({
             $or: [{
                 email
-            }, {
-                nationalId
             }, {
                 phone
             }],
@@ -75,9 +69,9 @@ exports.createUser = async (req, res) => {
  */
 exports.getCurrentUser = async (req, res) => {
     try {
-
+        console.log("user: ", req);
         const result = await User.findOne({
-            _id: req.user._id
+            _id: req.user.id
         });
 
         return res.status(201).send({
@@ -118,8 +112,7 @@ exports.userLogin = async (req, res) => {
         }
 
         const token = await user.generateAuthToken()
-        // user.token = token;
-        // res.status(200).json(user);
+        user.token = token;
 
         return res.status(200).send({
             message: 'OK',
@@ -147,18 +140,15 @@ exports.updateUser = async (req, res) => {
 
         let {
             email,
-            nationalId,
             phone
         } = req.body
 
         let dupplicate_user = await User.findOne({
             _id: {
-                $ne: req.user._id
+                $ne: req.params.userId
             },
             $or: [{
                 email: email
-            }, {
-                nationalId: nationalId
             }, {
                 phone: phone
             }],
@@ -172,8 +162,9 @@ exports.updateUser = async (req, res) => {
             });
         }
 
+        req.body.password = await hashPassword(req.body.password);
         const result = await User.findOneAndUpdate({
-            _id: req.user._id
+            _id: req.params.userId
         }, req.body, {
             new: true
         });
@@ -196,7 +187,7 @@ exports.deleteUser = async (req, res) => {
     try {
 
         const result = await User.findOneAndDelete({
-            _id: req.user._id
+            _id: req.params.userId
         });
         if (!result)
             return res.status(404).send({
@@ -211,3 +202,37 @@ exports.deleteUser = async (req, res) => {
         return res.status(500).send(e.toString().split('\"').join(''))
     }
 }
+
+/**
+ * Get user by Id
+ * @param req
+ * @param res
+ */
+
+exports.getUserById = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.userId);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ error: 'An error occurred' });
+    }
+};
+
+/**
+ * Get all users
+ * @param req
+ * @param res
+ */
+
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find();
+        res.json(users);
+    } catch (err) {
+        res.status(500).json({ error: 'An error occurred' });
+    }
+};

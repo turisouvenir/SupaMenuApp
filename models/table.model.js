@@ -7,8 +7,8 @@ const tableSchema = new mongoose.Schema({
         unique: true,
         required: true,
     },
-    restaurant: {
-        type: mongoose.Schema.Types.ObjectId,
+    restaurantId: {
+        type: String,
         ref: 'Restaurant',
         required: true,
     },
@@ -23,5 +23,5 @@ module.exports.Table = Table
 // Define validation schema for table data
 module.exports.tableValidationSchema = Joi.object({
     tableNumber: Joi.string().required(),
-    restaurant: Joi.string().required(),
+    restaurantId: Joi.string().required(),
 });

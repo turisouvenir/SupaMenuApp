@@ -21,7 +21,10 @@ app.get("/", (req, res) => {
     res.json({ message: "Welcome to Vehicle Tracking Management System." });
 });
 
-require('../Auth_project/routes/user.route')(app);
-require('../Auth_project/routes/resto.route')(app);
+require('./routes/menu.route')(app);
+require('./routes/user.route')(app);
+require('./routes/resto.route')(app);
+require('./routes/table.route')(app);
+require('./routes/order.route')(app);
 
 module.exports = app;
